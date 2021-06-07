@@ -43,7 +43,7 @@ async function deleteCourseById(req, res) {
     return res.sendStatus(404);
   }
   //如果有值，表示删掉
-  return res.sendStatus(204);
+  return res.json(course);
 }
 
 async function createCourse(req, res) {
