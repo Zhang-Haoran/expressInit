@@ -1,4 +1,6 @@
 const Course = require("../model/course");
+const Joi = require("joi");
+
 async function getAllCourses(req, res) {
   const courses = await Course.find().exec();
   res.json(courses);
@@ -47,7 +49,19 @@ async function deleteCourseById(req, res) {
 }
 
 async function createCourse(req, res) {
-  const { code, name, description } = req.body;
+  const schema = Joi.object({
+    name: Joi.string().min(2).max(10).required(),
+    code: Joi.string()
+      .regex(/^[a-zA-Z0-9]+$/)
+      .required(),
+    description: Joi.string(),
+  });
+  const { code, name, description } = await schema.validateAsync(req.body, {
+    allowUnknown: true, //允许接受不存在于schema的数据
+    stripUnknown: true, //虽然接受不存在数据，但会把他们删掉
+    abortEarly: false, //默认为true，有字段不合法就会提前返回。false的话，会把所有字段检测完
+  });
+
   const course = new Course({ _id: code, name, description });
   await course.save();
   return res.status(201).json(course);
