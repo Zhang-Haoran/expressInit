@@ -1,4 +1,5 @@
 const Student = require("../model/student");
+const Course = require("../model/course");
 async function getAllStudents(req, res) {
   const courses = await Student.find().exec();
   res.json(courses);
@@ -68,10 +69,33 @@ async function createStudent(req, res, next) {
   //   });
 }
 
+async function addStudentToCourse(req, res) {
+  //find student => get student id
+  //find course => get course code
+  const { id, code } = req.params;
+  const student = await Student.findById(id);
+  const course = await Course.findById(code); //需要导入Course model
+  //check course or student exist
+  if (!student || !course) {
+    return res.sendStatus(404);
+  }
+  //check student already enrolled
+  // if(student.courses.includes(course._id))
+
+  //add student to course
+  student.courses.addToSet(course._id); //如果重复 不会重复添加
+  await student.save();
+  return res.json(student);
+}
+
+function removeStudentFromCourse(req, res) {}
+
 module.exports = {
   getAllStudents,
   getStudentById,
   updateStudentById,
   deleteStudentById,
   createStudent,
+  addStudentToCourse,
+  removeStudentFromCourse,
 };

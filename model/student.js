@@ -29,6 +29,7 @@ const schema = new mongoose.Schema({
       msg: "Invalid email format",
     },
   },
+  courses: [{ type: String, ref: "Course" }], //ref里的表，要和course表注册时的名字对应，所以是大写
 });
 schema.virtual("code").get(function () {
   return this._id;
