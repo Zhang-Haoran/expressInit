@@ -7,7 +7,7 @@ async function getAllStudents(req, res) {
 
 async function getStudentById(req, res) {
   const { id } = req.params;
-  const student = await Student.findById(id);
+  const student = await Student.findById(id).populate("courses"); //populate 把相关联的课程信息也取出
   if (!student) {
     return res.sendStatus(404);
   }
@@ -35,6 +35,17 @@ async function deleteStudentById(req, res) {
   if (!student) {
     return res.sendStatus(404);
   }
+  await Course.updateMany(
+    //搜索条件
+    {
+      students: student._id, //查找student里面所有course为course id的 student
+    },
+    {
+      $pull: {
+        students: student._id, //把student中的那个课程删除掉
+      },
+    }
+  );
   //如果有值，表示删掉
   return res.json(student);
 }
@@ -90,7 +101,26 @@ async function addStudentToCourse(req, res) {
   return res.json(student);
 }
 
-function removeStudentFromCourse(req, res) {}
+async function removeStudentFromCourse(req, res) {
+  //find student => get student id
+  //find course => get course code
+  const { id, code } = req.params;
+  const student = await Student.findById(id);
+  const course = await Course.findById(code); //需要导入Course model
+  //check course or student exist
+  if (!student || !course) {
+    return res.sendStatus(404);
+  }
+  //check student already enrolled
+  // if(student.courses.includes(course._id))
+
+  //add student to course
+  student.courses.pull(course._id); //pull把某项从array中取出，有的话取出，没的话不做改动
+  course.students.pull(student._id);
+  await student.save();
+  await course.save();
+  return res.json(student);
+}
 
 module.exports = {
   getAllStudents,
