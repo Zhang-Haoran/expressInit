@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Joi = require("Joi");
 
 const schema = new mongoose.Schema({
   firstName: {
@@ -14,6 +15,19 @@ const schema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    validator: {
+      validator: (email) => {
+        const validation = Joi.string().email().validate(email);
+        const { error } = validation;
+        //如果error有值则验证失败
+        if (error) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      msg: "Invalid email format",
+    },
   },
 });
 schema.virtual("code").get(function () {

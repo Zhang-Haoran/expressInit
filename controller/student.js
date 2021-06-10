@@ -38,11 +38,34 @@ async function deleteStudentById(req, res) {
   return res.json(student);
 }
 
-async function createStudent(req, res) {
+async function createStudent(req, res, next) {
   const { code, firstName, lastName, email } = req.body;
   const student = new Student({ _id: code, firstName, lastName, email });
-  await student.save();
+  //第一种写法
+  try {
+    await student.save(); //.save()在update函数里，可以换成findByIdAndUpdate
+  } catch (e) {
+    next(e); //传入errorhandler
+  }
   return res.status(201).json(student);
+
+  //第二种写法
+  // student.save((error, result) => {
+  //   if (error) {
+  //     return next(error);
+  //   }
+  //   return res.status(201).json(student);
+  // });
+
+  //第三种写法
+  // student
+  //   .save()
+  //   .then((result) => {
+  //     res.status(201).json(result);
+  //   })
+  //   .catch((error) => {
+  //     next(error);
+  //   });
 }
 
 module.exports = {
