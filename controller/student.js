@@ -84,7 +84,9 @@ async function addStudentToCourse(req, res) {
 
   //add student to course
   student.courses.addToSet(course._id); //如果重复 不会重复添加
+  course.students.addToSet(student._id);
   await student.save();
+  await course.save();
   return res.json(student);
 }
 

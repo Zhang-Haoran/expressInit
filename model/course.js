@@ -13,6 +13,15 @@ const schema = new Schema({
     type: String,
     default: "This is a description",
   },
+  students: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Student",
+    },
+  ],
+  __v: {
+    type: Number,
+  },
 });
 
 schema.virtual("code").get(function () {
