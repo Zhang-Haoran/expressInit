@@ -9,6 +9,7 @@ async function addUser(req, res) {
     return res.status(409).json("User already exist");
   }
   const user = new User({ username, password });
+  await user.hashPassword();
   await user.save();
   const token = generateToken({ id: user._id });
   return res.status(201).json({ token, username });
